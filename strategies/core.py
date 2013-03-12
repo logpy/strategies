@@ -30,13 +30,11 @@ def condition(cond, fn):
         if cond(x):
             return fn(x)
         else:
-            return      x
+            return x
     return conditioned_rl
 
 def chain(*fns):
-    """
-    Compose a sequence of fns so that they apply to the x sequentially
-    """
+    """ Sequentially apply a sequence of functions """
     def chain_rl(x):
         for fn in fns:
             x = fn(x)
@@ -44,7 +42,7 @@ def chain(*fns):
     return chain_rl
 
 def debug(fn, file=None):
-    """ Print out before and after xessions each time fn is used """
+    """ Print input and output each time function has an effect """
     if file is None:
         from sys import stdout
         file = stdout
@@ -57,7 +55,7 @@ def debug(fn, file=None):
     return debug_rl
 
 def do_one(*fns):
-    """ Try each of the fns until one works. Then stop. """
+    """ Try each of the functions until one works. Then stop. """
     def do_one_rl(x):
         for rl in fns:
             result = rl(x)
@@ -67,7 +65,7 @@ def do_one(*fns):
     return do_one_rl
 
 def switch(key, fndict):
-    """ Select a fn based on the result of key called on the function """
+    """ Select a function based on the result of key called on the function """
     def switch_rl(x):
         rl = fndict.get(key(x), identity)
         return rl(x)
@@ -89,7 +87,7 @@ def typed(fntypes):
     return switch(type, fntypes)
 
 def minimize(*fns, **kwargs):
-    """ Select result of fns that minimizes objective
+    """ Select result of functions that minimizes objective
 
     >>> from sympy.strategies import minimize
     >>> from strategies.examples import inc, dec
