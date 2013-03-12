@@ -17,7 +17,11 @@ off as a separate project.
 Install
 -------
 
+The interface to this library are in flux.  Feedback is very welcome.  
+Confidence in consistency is misplaced.
+
     sudo pip install strategies
+
 
 License
 -------
