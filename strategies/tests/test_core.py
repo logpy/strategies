@@ -1,16 +1,6 @@
-from sympy.strategies.core import (null_safe, exhaust, memoize, condition,
-        chain, tryit, do_one, debug, switch, minimize)
+from sympy.strategies.core import (exhaust, memoize, condition,
+        chain, do_one, debug, switch, minimize)
 from functools import partial
-
-def test_null_safe():
-    def rl(expr):
-        if expr == 1:
-            return 2
-    safe_rl = null_safe(rl)
-    assert rl(1) == safe_rl(1)
-
-    assert      rl(3) == None
-    assert safe_rl(3) == 3
 
 def posdec(x):
     if x > 0:
@@ -37,12 +27,6 @@ def test_chain():
     rl = chain(posdec, posdec)
     assert rl(5) == 3
     assert rl(1) == 0
-
-def test_tryit():
-    def rl(expr):
-        assert False
-    safe_rl = tryit(rl)
-    assert safe_rl(1) == 1
 
 def test_do_one():
     rl = do_one(posdec, posdec)

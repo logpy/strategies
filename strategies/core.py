@@ -56,25 +56,6 @@ def debug(fn, file=None):
         return result
     return debug_rl
 
-def null_safe(fn):
-    """ Return original x if fn returns None """
-    def null_safe_rl(x):
-        result = fn(x)
-        if result is None:
-            return x
-        else:
-            return result
-    return null_safe_rl
-
-def tryit(fn):
-    """ Return original x if fn raises exception """
-    def try_rl(x):
-        try:
-            return fn(x)
-        except:
-            return x
-    return try_rl
-
 def do_one(*fns):
     """ Try each of the fns until one works. Then stop. """
     def do_one_rl(x):
