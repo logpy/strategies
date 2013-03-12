@@ -14,6 +14,11 @@ the Stratego/XT project.  It was first implemented as part of the
 [SymPy](http://sympy.org) Python library for symbolic algebra but was then spun
 off as a separate project. 
 
+Install
+-------
+
+    sudo pip install strategies
+
 License
 -------
 
