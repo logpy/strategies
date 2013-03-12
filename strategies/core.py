@@ -41,18 +41,25 @@ def chain(*fns):
         return x
     return chain_rl
 
-def debug(fn, file=None):
-    """ Print input and output each time function has an effect """
-    if file is None:
-        from sys import stdout
-        file = stdout
-    def debug_rl(x):
+def onaction(fn, action):
+    def onaction_brl(x):
         result = fn(x)
         if result != x:
-            file.write("fn:  %s\n"%fn.func_name)
-            file.write("In:  %s\nOut: %s\n\n"%(x, result))
+            action(fn, x, result)
         return result
-    return debug_rl
+    return onaction_brl
+
+def debug(fn, file=None):
+    """ Print input and output each time function has an effect """
+    if not file:
+        from sys import stdout
+        file = stdout
+
+    def write(fn, x, result):
+        file.write("Fn:  %s\n"%fn.func_name)
+        file.write("In:  %s\nOut: %s\n\n"%(x, result))
+
+    return onaction(fn, write)
 
 def do_one(*fns):
     """ Try each of the functions until one works. Then stop. """
