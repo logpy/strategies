@@ -4,106 +4,106 @@ import itertools
 def identity(x):
     yield x
 
-def exhaust(brule):
+def exhaust(fn):
     """ Apply a branching rule repeatedly until it has no effect """
-    def exhaust_brl(expr):
-        seen = set([expr])
-        for nexpr in brule(expr):
-            if nexpr not in seen:
-                seen.add(nexpr)
-                for nnexpr in exhaust_brl(nexpr):
-                    yield nnexpr
-        if seen == set([expr]):
-            yield expr
+    def exhaust_brl(x):
+        seen = set([x])
+        for nx in fn(x):
+            if nx not in seen:
+                seen.add(nx)
+                for nnx in exhaust_brl(nx):
+                    yield nnx
+        if seen == set([x]):
+            yield x
     return exhaust_brl
 
-def onaction(brule, fn):
-    def onaction_brl(expr):
-        for result in brule(expr):
-            if result != expr:
-                fn(brule, expr, result)
+def onaction(fn, action):
+    def onaction_brl(x):
+        for result in fn(x):
+            if result != x:
+                action(fn, x, result)
             yield result
     return onaction_brl
 
-def debug(brule, file=None):
+def debug(fn, file=None):
     """ Print the input and output expressions at each rule application """
     if not file:
         from sys import stdout
         file = stdout
 
-    def write(brl, expr, result):
+    def write(brl, x, result):
         file.write("Rule: %s\n"%brl.func_name)
-        file.write("In: %s\nOut: %s\n\n"%(expr, result))
+        file.write("In: %s\nOut: %s\n\n"%(x, result))
 
-    return onaction(brule, write)
+    return onaction(fn, write)
 
-def multiplex(*brules):
+def multiplex(*fns):
     """ Multiplex many branching rules into one """
-    def multiplex_brl(expr):
+    def multiplex_brl(x):
         seen = set([])
-        for brl in brules:
-            for nexpr in brl(expr):
-                if nexpr not in seen:
-                    seen.add(nexpr)
-                    yield nexpr
+        for brl in fns:
+            for nx in brl(x):
+                if nx not in seen:
+                    seen.add(nx)
+                    yield nx
     return multiplex_brl
 
-def condition(cond, brule):
+def condition(cond, fn):
     """ Only apply branching rule if condition is true """
-    def conditioned_brl(expr):
-        if cond(expr):
-            for x in brule(expr): yield x
+    def conditioned_brl(x):
+        if cond(x):
+            for x in fn(x): yield x
         else:
             pass
     return conditioned_brl
 
-def sfilter(pred, brule):
+def sfilter(pred, fn):
     """ Yield only those results which satisfy the predicate """
-    def filtered_brl(expr):
-        for x in itertools.ifilter(pred, brule(expr)):
+    def filtered_brl(x):
+        for x in itertools.ifilter(pred, fn(x)):
             yield x
     return filtered_brl
 
-def notempty(brule):
-    def notempty_brl(expr):
+def notempty(fn):
+    def notempty_brl(x):
         yielded = False
-        for nexpr in brule(expr):
+        for nx in fn(x):
             yielded = True
-            yield nexpr
+            yield nx
         if not yielded:
-            yield expr
+            yield x
     return notempty_brl
 
-def do_one(*brules):
+def do_one(*fns):
     """ Execute one of the branching rules """
-    def do_one_brl(expr):
+    def do_one_brl(x):
         yielded = False
-        for brl in brules:
-            for nexpr in brl(expr):
+        for brl in fns:
+            for nx in brl(x):
                 yielded = True
-                yield nexpr
+                yield nx
             if yielded:
                 raise StopIteration()
     return do_one_brl
 
-def chain(*brules):
+def chain(*fns):
     """
-    Compose a sequence of brules so that they apply to the expr sequentially
+    Compose a sequence of fns so that they apply to the expr sequentially
     """
-    def chain_brl(expr):
-        if not brules:
-            yield expr
+    def chain_brl(x):
+        if not fns:
+            yield x
             raise StopIteration()
 
-        head, tail = brules[0], brules[1:]
-        for nexpr in head(expr):
-            for nnexpr in chain(*tail)(nexpr):
-                yield nnexpr
+        head, tail = fns[0], fns[1:]
+        for nx in head(x):
+            for nnx in chain(*tail)(nx):
+                yield nnx
 
     return chain_brl
 
 def yieldify(rl):
     """ Turn a rule into a branching rule """
-    def brl(expr):
-        yield rl(expr)
+    def brl(x):
+        yield rl(x)
     return brl

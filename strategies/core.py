@@ -3,100 +3,100 @@ from functools import partial
 
 identity = lambda x: x
 
-def exhaust(rule):
-    """ Apply a rule repeatedly until it has no effect """
-    def exhaustive_rl(expr):
-        new, old = rule(expr), expr
+def exhaust(fn):
+    """ Apply a fn repeatedly until it has no effect """
+    def exhaustive_rl(x):
+        new, old = fn(x), x
         while(new != old):
-            new, old = rule(new), new
+            new, old = fn(new), new
         return new
     return exhaustive_rl
 
-def memoize(rule):
-    """ Memoized version of a rule """
+def memoize(fn):
+    """ Memoized version of a fn """
     cache = {}
-    def memoized_rl(expr):
-        if expr in cache:
-            return cache[expr]
+    def memoized_rl(x):
+        if x in cache:
+            return cache[x]
         else:
-            result = rule(expr)
-            cache[expr] = result
+            result = fn(x)
+            cache[x] = result
             return result
     return memoized_rl
 
-def condition(cond, rule):
-    """ Only apply rule if condition is true """
-    def conditioned_rl(expr):
-        if cond(expr):
-            return rule(expr)
+def condition(cond, fn):
+    """ Only apply fn if condition is true """
+    def conditioned_rl(x):
+        if cond(x):
+            return fn(x)
         else:
-            return      expr
+            return      x
     return conditioned_rl
 
-def chain(*rules):
+def chain(*fns):
     """
-    Compose a sequence of rules so that they apply to the expr sequentially
+    Compose a sequence of fns so that they apply to the x sequentially
     """
-    def chain_rl(expr):
-        for rule in rules:
-            expr = rule(expr)
-        return expr
+    def chain_rl(x):
+        for fn in fns:
+            x = fn(x)
+        return x
     return chain_rl
 
-def debug(rule, file=None):
-    """ Print out before and after expressions each time rule is used """
+def debug(fn, file=None):
+    """ Print out before and after xessions each time fn is used """
     if file is None:
         from sys import stdout
         file = stdout
-    def debug_rl(expr):
-        result = rule(expr)
-        if result != expr:
-            file.write("Rule: %s\n"%rule.func_name)
-            file.write("In:   %s\nOut:  %s\n\n"%(expr, result))
+    def debug_rl(x):
+        result = fn(x)
+        if result != x:
+            file.write("fn:  %s\n"%fn.func_name)
+            file.write("In:  %s\nOut: %s\n\n"%(x, result))
         return result
     return debug_rl
 
-def null_safe(rule):
-    """ Return original expr if rule returns None """
-    def null_safe_rl(expr):
-        result = rule(expr)
+def null_safe(fn):
+    """ Return original x if fn returns None """
+    def null_safe_rl(x):
+        result = fn(x)
         if result is None:
-            return expr
+            return x
         else:
             return result
     return null_safe_rl
 
-def tryit(rule):
-    """ Return original expr if rule raises exception """
-    def try_rl(expr):
+def tryit(fn):
+    """ Return original x if fn raises exception """
+    def try_rl(x):
         try:
-            return rule(expr)
+            return fn(x)
         except:
-            return expr
+            return x
     return try_rl
 
-def do_one(*rules):
-    """ Try each of the rules until one works. Then stop. """
-    def do_one_rl(expr):
-        for rl in rules:
-            result = rl(expr)
-            if result != expr:
+def do_one(*fns):
+    """ Try each of the fns until one works. Then stop. """
+    def do_one_rl(x):
+        for rl in fns:
+            result = rl(x)
+            if result != x:
                 return result
-        return expr
+        return x
     return do_one_rl
 
-def switch(key, ruledict):
-    """ Select a rule based on the result of key called on the function """
-    def switch_rl(expr):
-        rl = ruledict.get(key(expr), identity)
-        return rl(expr)
+def switch(key, fndict):
+    """ Select a fn based on the result of key called on the function """
+    def switch_rl(x):
+        rl = fndict.get(key(x), identity)
+        return rl(x)
     return switch_rl
 
-def typed(ruletypes):
-    """ Apply rules based on the expression type
+def typed(fntypes):
+    """ Apply fns based on the input type
 
     inputs:
-        ruletypes -- a dict mapping {Type: rule}
+        fntypes -- a dict mapping {Type: fn}
 
     >>> from strategies.examples import inc, dec
     >>> f = typed({int: inc, float: dec})
@@ -105,10 +105,10 @@ def typed(ruletypes):
     >>> f(3.0)
     2.0
     """
-    return switch(type, ruletypes)
+    return switch(type, fntypes)
 
-def minimize(*rules, **kwargs):
-    """ Select result of rules that minimizes objective
+def minimize(*fns, **kwargs):
+    """ Select result of fns that minimizes objective
 
     >>> from sympy.strategies import minimize
     >>> from strategies.examples import inc, dec
@@ -122,6 +122,6 @@ def minimize(*rules, **kwargs):
     """
 
     objective = kwargs.get('objective', identity)
-    def minrule(expr):
-        return min([rule(expr) for rule in rules], key=objective)
-    return minrule
+    def minfn(x):
+        return min([fn(x) for fn in fns], key=objective)
+    return minfn
