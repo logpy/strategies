@@ -5,49 +5,49 @@ identity = lambda x: x
 
 def exhaust(fn):
     """ Apply a fn repeatedly until it has no effect """
-    def exhaustive_rl(x):
+    def exhaustive_fn(x):
         new, old = fn(x), x
         while(new != old):
             new, old = fn(new), new
         return new
-    return exhaustive_rl
+    return exhaustive_fn
 
 def memoize(fn):
     """ Memoized version of a fn """
     cache = {}
-    def memoized_rl(x):
+    def memoized_fn(x):
         if x in cache:
             return cache[x]
         else:
             result = fn(x)
             cache[x] = result
             return result
-    return memoized_rl
+    return memoized_fn
 
 def condition(cond, fn):
     """ Only apply fn if condition is true """
-    def conditioned_rl(x):
+    def conditioned_fn(x):
         if cond(x):
             return fn(x)
         else:
             return x
-    return conditioned_rl
+    return conditioned_fn
 
 def chain(*fns):
     """ Sequentially apply a sequence of functions """
-    def chain_rl(x):
+    def chain_fn(x):
         for fn in fns:
             x = fn(x)
         return x
-    return chain_rl
+    return chain_fn
 
 def onaction(fn, action):
-    def onaction_brl(x):
+    def onaction_fn(x):
         result = fn(x)
         if result != x:
             action(fn, x, result)
         return result
-    return onaction_brl
+    return onaction_fn
 
 def debug(fn, file=None):
     """ Print input and output each time function has an effect """
@@ -63,20 +63,20 @@ def debug(fn, file=None):
 
 def do_one(*fns):
     """ Try each of the functions until one works. Then stop. """
-    def do_one_rl(x):
-        for rl in fns:
-            result = rl(x)
+    def do_one_fn(x):
+        for fn in fns:
+            result = fn(x)
             if result != x:
                 return result
         return x
-    return do_one_rl
+    return do_one_fn
 
 def switch(key, fndict):
     """ Select a function based on the result of key called on the function """
-    def switch_rl(x):
-        rl = fndict.get(key(x), identity)
-        return rl(x)
-    return switch_rl
+    def switch_fn(x):
+        fn = fndict.get(key(x), identity)
+        return fn(x)
+    return switch_fn
 
 def typed(fntypes):
     """ Apply fns based on the input type
@@ -98,12 +98,12 @@ def minimize(*fns, **kwargs):
 
     >>> from sympy.strategies import minimize
     >>> from strategies.examples import inc, dec
-    >>> rl = minimize(inc, dec)
-    >>> rl(4)
+    >>> fn = minimize(inc, dec)
+    >>> fn(4)
     3
 
-    >>> rl = minimize(inc, dec, objective=lambda x: -x)  # maximize
-    >>> rl(4)
+    >>> fn = minimize(inc, dec, objective=lambda x: -x)  # maximize
+    >>> fn(4)
     5
     """
 
