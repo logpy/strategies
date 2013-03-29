@@ -1,10 +1,10 @@
 Strategies
 ==========
 
-A Python library for programming control flow.
+A Python library for control flow programming.
 
 This project contains a set of complementary higher order functions that
-loosely resemble the Stratego[1] language.
+loosely resembles the Stratego language.
 
 History
 -------
