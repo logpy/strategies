@@ -96,7 +96,7 @@ def typed(fntypes):
 def minimize(*fns, **kwargs):
     """ Select result of functions that minimizes objective
 
-    >>> from sympy.strategies import minimize
+    >>> from strategies import minimize
     >>> from strategies.examples import inc, dec
     >>> fn = minimize(inc, dec)
     >>> fn(4)

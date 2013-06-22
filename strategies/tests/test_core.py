@@ -1,4 +1,4 @@
-from sympy.strategies.core import (exhaust, memoize, condition,
+from strategies.core import (exhaust, memoize, condition,
         chain, do_one, debug, switch, minimize)
 from functools import partial
 
