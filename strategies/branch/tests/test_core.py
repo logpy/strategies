@@ -51,7 +51,7 @@ def test_debug():
     assert '4' in log
 
 def test_multiplex():
-    brl = multiplex(posdec, branch5)
+    brl = multiplex([posdec, branch5])
     assert set(brl(3)) == set([2])
     assert set(brl(7)) == set([6, 8])
     assert set(brl(5)) == set([4, 6])
@@ -76,11 +76,11 @@ def test_notempty():
     assert set(brl(5)) == set([5])
 
 def test_chain():
-    assert list(chain()(2)) == [2]  # identity
-    assert list(chain(inc, inc)(2)) == [4]
-    assert list(chain(branch5, inc)(4)) == [4]
-    assert set(chain(branch5, inc)(5)) == set([5, 7])
-    assert list(chain(inc, branch5)(5)) == [7]
+    assert list(chain([], 2)) == [2]  # identity
+    assert list(chain([inc, inc])(2)) == [4]
+    assert list(chain([branch5, inc])(4)) == [4]
+    assert set(chain([branch5, inc])(5)) == set([5, 7])
+    assert list(chain([inc, branch5])(5)) == [7]
 
 def test_onaction():
     L = []
@@ -103,6 +103,6 @@ def test_do_one():
         raise ValueError()
         yield False
 
-    assert list(do_one(inc)(3)) == [4]
-    assert list(do_one(inc, bad)(3)) == [4]
-    assert list(do_one(inc, posdec)(3)) == [4]
+    assert list(do_one([inc])(3)) == [4]
+    assert list(do_one([inc, bad])(3)) == [4]
+    assert list(do_one([inc, posdec])(3)) == [4]

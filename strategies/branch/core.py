@@ -35,16 +35,15 @@ def debug(fn, file=None):
 
     return onaction(fn, write)
 
-def multiplex(*fns):
+@curry
+def multiplex(fns, x):
     """ Multiplex many branching rules into one """
-    def multiplex_brl(x):
-        seen = set([])
-        for brl in fns:
-            for nx in brl(x):
-                if nx not in seen:
-                    seen.add(nx)
-                    yield nx
-    return multiplex_brl
+    seen = set([])
+    for brl in fns:
+        for nx in brl(x):
+            if nx not in seen:
+                seen.add(nx)
+                yield nx
 
 @curry
 def condition(cond, fn, x):
@@ -70,33 +69,30 @@ def notempty(fn, x):
     if not yielded:
         yield x
 
-def do_one(*fns):
+@curry
+def do_one(fns, x):
     """ Execute one of the branching rules """
-    def do_one_brl(x):
-        yielded = False
-        for brl in fns:
-            for nx in brl(x):
-                yielded = True
-                yield nx
-            if yielded:
-                raise StopIteration()
-    return do_one_brl
+    yielded = False
+    for brl in fns:
+        for nx in brl(x):
+            yielded = True
+            yield nx
+        if yielded:
+            raise StopIteration()
 
-def chain(*fns):
+@curry
+def chain(fns, x):
     """
     Compose a sequence of fns so that they apply to the expr sequentially
     """
-    def chain_brl(x):
-        if not fns:
-            yield x
-            raise StopIteration()
+    if not fns:
+        yield x
+        raise StopIteration()
 
-        head, tail = fns[0], fns[1:]
-        for nx in head(x):
-            for nnx in chain(*tail)(nx):
-                yield nnx
-
-    return chain_brl
+    head, tail = fns[0], fns[1:]
+    for nx in head(x):
+        for nnx in chain(tail)(nx):
+            yield nnx
 
 
 @curry
