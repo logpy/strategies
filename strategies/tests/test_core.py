@@ -7,6 +7,7 @@ def posdec(x):
         return x-1
     else:
         return x
+
 def test_exhaust():
     sink = exhaust(posdec)
     assert sink(5) == 0
@@ -24,12 +25,12 @@ def test_condition():
     assert rl(4) == 3
 
 def test_chain():
-    rl = chain(posdec, posdec)
+    rl = chain([posdec, posdec])
     assert rl(5) == 3
     assert rl(1) == 0
 
 def test_do_one():
-    rl = do_one(posdec, posdec)
+    rl = do_one([posdec, posdec])
     assert rl(5) == 4
 
 def test_debug():
@@ -60,16 +61,16 @@ def test_switch():
 def test_minimize():
     inc = lambda x: x + 1
     dec = lambda x: x - 1
-    rl = minimize(inc, dec)
+    rl = minimize([inc, dec])
     assert rl(4) == 3
 
-    rl = minimize(inc, dec, objective=lambda x: -x)
+    rl = minimize([inc, dec], objective=lambda x: -x)
     assert rl(4) == 5
 
 def test_do_one():
     rl1 = lambda x: 2 if x == 1 else x
     rl2 = lambda x: 3 if x == 2 else x
 
-    rule = do_one(rl1, rl2)
+    rule = do_one([rl1, rl2])
     assert rule(1) == 2
     assert rule(rule(1)) == 3

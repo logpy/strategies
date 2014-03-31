@@ -32,8 +32,8 @@ def treeapply(tree, join, leaf=identity):
     """
     for typ in join:
         if isinstance(tree, typ):
-            return join[typ](*map(partial(treeapply, join=join, leaf=leaf),
-                                  tree))
+            return join[typ]([treeapply(child, join=join, leaf=leaf)
+                               for child in tree])
     return leaf(tree)
 
 def greedy(tree, objective=identity, **kwargs):

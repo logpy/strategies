@@ -6,9 +6,9 @@ def test_treeapply():
     tree = ([3, 3], [4, 1], 2)
     assert treeapply(tree, {list: min, tuple: max}) == 3
 
-    add = lambda *args: sum(args)
-    mul = lambda *args: reduce(lambda a, b: a*b, args, 1)
-    assert treeapply(tree, {list: add, tuple: mul}) == 60
+    mul = lambda a, b: a*b
+    prod = lambda args: reduce(mul, args)
+    assert treeapply(tree, {list: sum, tuple: prod}) == 60
 
 def test_treeapply_leaf():
     assert treeapply(3, {}, leaf=lambda x: x**2) == 9
@@ -25,8 +25,8 @@ def test_treeapply_strategies():
     double = lambda x: 2*x
 
     assert treeapply(inc, join) == inc
-    assert treeapply((inc, dec), join)(5) == minimize(inc, dec)(5)
-    assert treeapply([inc, dec], join)(5) == chain(inc, dec)(5)
+    assert treeapply((inc, dec), join)(5) == minimize([inc, dec], 5)
+    assert treeapply([inc, dec], join)(5) == chain([inc, dec], 5)
     tree = (inc, [dec, double]) # either inc or dec-then-double
     assert treeapply(tree, join)(5) == 6
     assert treeapply(tree, join)(1) == 0

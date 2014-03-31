@@ -20,13 +20,12 @@ def condition(cond, fn, x):
     else:
         return x
 
-def chain(*fns):
+@curry
+def chain(fns, x):
     """ Sequentially apply a sequence of functions """
-    def chain_fn(x):
-        for fn in fns:
-            x = fn(x)
-        return x
-    return chain_fn
+    for fn in fns:
+        x = fn(x)
+    return x
 
 @curry
 def onaction(fn, action, x):
@@ -47,15 +46,14 @@ def debug(fn, file=None):
 
     return onaction(fn, write)
 
-def do_one(*fns):
+@curry
+def do_one(fns, x):
     """ Try each of the functions until one works. Then stop. """
-    def do_one_fn(x):
-        for fn in fns:
-            result = fn(x)
-            if result != x:
-                return result
-        return x
-    return do_one_fn
+    for fn in fns:
+        result = fn(x)
+        if result != x:
+            return result
+    return x
 
 @curry
 def switch(key, fndict, x):
@@ -79,21 +77,20 @@ def typed(fntypes, x):
     """
     return switch(type, fntypes, x)
 
-def minimize(*fns, **kwargs):
+@curry
+def minimize(fns, x, **kwargs):
     """ Select result of functions that minimizes objective
 
     >>> from strategies import minimize
     >>> from strategies.examples import inc, dec
-    >>> fn = minimize(inc, dec)
+    >>> fn = minimize([inc, dec])
     >>> fn(4)
     3
 
-    >>> fn = minimize(inc, dec, objective=lambda x: -x)  # maximize
+    >>> fn = minimize([inc, dec], objective=lambda x: -x)  # maximize
     >>> fn(4)
     5
     """
 
     objective = kwargs.get('objective', identity)
-    def minfn(x):
-        return min([fn(x) for fn in fns], key=objective)
-    return minfn
+    return min([fn(x) for fn in fns], key=objective)
