@@ -42,7 +42,7 @@ def debug(fn, file=None):
         file = stdout
 
     def write(fn, x, result):
-        file.write("Fn:  %s\n"%fn.func_name)
+        file.write("Fn:  %s\n"%fn.__name__)
         file.write("In:  %s\nOut: %s\n\n"%(x, result))
 
     return onaction(fn, write)

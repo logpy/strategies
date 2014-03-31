@@ -33,14 +33,17 @@ def test_do_one():
     assert rl(5) == 4
 
 def test_debug():
-    import StringIO
-    file = StringIO.StringIO()
+    try:
+        from StringIO import StringIO
+    except ImportError:
+        from io import StringIO
+    file = StringIO()
     rl = debug(posdec, file)
     rl(5)
     log = file.getvalue()
     file.close()
 
-    assert posdec.func_name in log
+    assert posdec.__name__ in log
     assert '5' in log
     assert '4' in log
 

@@ -1,6 +1,5 @@
 """ Generic SymPy-Independent Strategies """
-import itertools
-from toolz import curry
+from toolz import curry, filter
 
 def identity(x):
     yield x
@@ -31,7 +30,7 @@ def debug(fn, file=None):
         file = stdout
 
     def write(brl, x, result):
-        file.write("Rule: %s\n"%brl.func_name)
+        file.write("Rule: %s\n"%brl.__name__)
         file.write("In: %s\nOut: %s\n\n"%(x, result))
 
     return onaction(fn, write)
@@ -59,7 +58,7 @@ def condition(cond, fn, x):
 @curry
 def sfilter(pred, fn, x):
     """ Yield only those results which satisfy the predicate """
-    for x in itertools.ifilter(pred, fn(x)):
+    for x in filter(pred, fn(x)):
         yield x
 
 @curry
