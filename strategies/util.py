@@ -1,4 +1,5 @@
 import itertools as it
+from toolz import unique
 
 def interleave(seqs, pass_exceptions=()):
     iters = it.imap(iter, seqs)
@@ -11,13 +12,6 @@ def interleave(seqs, pass_exceptions=()):
             except (StopIteration,) + tuple(pass_exceptions):
                 pass
         iters = newiters
-
-def unique(seq):
-    seen = set()
-    for item in seq:
-        if item not in seen:
-            seen.add(item)
-            yield item
 
 def fnmap(fns, val):
     return (fn(val) for fn in fns)

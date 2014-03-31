@@ -1,29 +1,28 @@
 """ Generic SymPy-Independent Strategies """
 import itertools
+from toolz import curry
 
 def identity(x):
     yield x
 
-def exhaust(fn):
+@curry
+def exhaust(fn, x):
     """ Apply a branching rule repeatedly until it has no effect """
-    def exhaust_brl(x):
-        seen = set([x])
-        for nx in fn(x):
-            if nx not in seen:
-                seen.add(nx)
-                for nnx in exhaust_brl(nx):
-                    yield nnx
-        if seen == set([x]):
-            yield x
-    return exhaust_brl
+    seen = set([x])
+    for nx in fn(x):
+        if nx not in seen:
+            seen.add(nx)
+            for nnx in exhaust(fn, nx):
+                yield nnx
+    if seen == set([x]):
+        yield x
 
-def onaction(fn, action):
-    def onaction_brl(x):
-        for result in fn(x):
-            if result != x:
-                action(fn, x, result)
-            yield result
-    return onaction_brl
+@curry
+def onaction(fn, action, x):
+    for result in fn(x):
+        if result != x:
+            action(fn, x, result)
+        yield result
 
 def debug(fn, file=None):
     """ Print the input and output expressions at each rule application """
@@ -48,31 +47,29 @@ def multiplex(*fns):
                     yield nx
     return multiplex_brl
 
-def condition(cond, fn):
+@curry
+def condition(cond, fn, x):
     """ Only apply branching rule if condition is true """
-    def conditioned_brl(x):
-        if cond(x):
-            for x in fn(x): yield x
-        else:
-            pass
-    return conditioned_brl
+    if cond(x):
+        for x in fn(x):
+            yield x
+    else:
+        pass
 
-def sfilter(pred, fn):
+@curry
+def sfilter(pred, fn, x):
     """ Yield only those results which satisfy the predicate """
-    def filtered_brl(x):
-        for x in itertools.ifilter(pred, fn(x)):
-            yield x
-    return filtered_brl
+    for x in itertools.ifilter(pred, fn(x)):
+        yield x
 
-def notempty(fn):
-    def notempty_brl(x):
-        yielded = False
-        for nx in fn(x):
-            yielded = True
-            yield nx
-        if not yielded:
-            yield x
-    return notempty_brl
+@curry
+def notempty(fn, x):
+    yielded = False
+    for nx in fn(x):
+        yielded = True
+        yield nx
+    if not yielded:
+        yield x
 
 def do_one(*fns):
     """ Execute one of the branching rules """
@@ -102,8 +99,8 @@ def chain(*fns):
 
     return chain_brl
 
-def yieldify(rl):
+
+@curry
+def yieldify(rl, x):
     """ Turn a rule into a branching rule """
-    def brl(x):
-        yield rl(x)
-    return brl
+    yield rl(x)
