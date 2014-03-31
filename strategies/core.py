@@ -1,37 +1,24 @@
 """ Generic SymPy-Independent Strategies """
 from functools import partial
+from toolz import curry, memoize
 
 identity = lambda x: x
 
-def exhaust(fn):
+@curry
+def exhaust(fn, x):
     """ Apply a fn repeatedly until it has no effect """
-    def exhaustive_fn(x):
-        new, old = fn(x), x
-        while(new != old):
-            new, old = fn(new), new
-        return new
-    return exhaustive_fn
+    new, old = fn(x), x
+    while(new != old):
+        new, old = fn(new), new
+    return new
 
-def memoize(fn):
-    """ Memoized version of a fn """
-    cache = {}
-    def memoized_fn(x):
-        if x in cache:
-            return cache[x]
-        else:
-            result = fn(x)
-            cache[x] = result
-            return result
-    return memoized_fn
-
-def condition(cond, fn):
+@curry
+def condition(cond, fn, x):
     """ Only apply fn if condition is true """
-    def conditioned_fn(x):
-        if cond(x):
-            return fn(x)
-        else:
-            return x
-    return conditioned_fn
+    if cond(x):
+        return fn(x)
+    else:
+        return x
 
 def chain(*fns):
     """ Sequentially apply a sequence of functions """
@@ -41,13 +28,12 @@ def chain(*fns):
         return x
     return chain_fn
 
-def onaction(fn, action):
-    def onaction_fn(x):
-        result = fn(x)
-        if result != x:
-            action(fn, x, result)
-        return result
-    return onaction_fn
+@curry
+def onaction(fn, action, x):
+    result = fn(x)
+    if result != x:
+        action(fn, x, result)
+    return result
 
 def debug(fn, file=None):
     """ Print input and output each time function has an effect """
@@ -71,14 +57,14 @@ def do_one(*fns):
         return x
     return do_one_fn
 
-def switch(key, fndict):
+@curry
+def switch(key, fndict, x):
     """ Select a function based on the result of key called on the function """
-    def switch_fn(x):
-        fn = fndict.get(key(x), identity)
-        return fn(x)
-    return switch_fn
+    fn = fndict.get(key(x), identity)
+    return fn(x)
 
-def typed(fntypes):
+@curry
+def typed(fntypes, x):
     """ Apply fns based on the input type
 
     inputs:
@@ -91,7 +77,7 @@ def typed(fntypes):
     >>> f(3.0)
     2.0
     """
-    return switch(type, fntypes)
+    return switch(type, fntypes, x)
 
 def minimize(*fns, **kwargs):
     """ Select result of functions that minimizes objective
