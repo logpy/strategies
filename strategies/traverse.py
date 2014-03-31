@@ -1,5 +1,5 @@
 """ Strategies to Traverse a Tree """
-from strategies.core import chain, do_one
+from .core import chain, do_one
 from term import new, op, args, isleaf
 from toolz import curry
 

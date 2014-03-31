@@ -1,7 +1,7 @@
 from functools import partial
 from strategies import chain, minimize
-import strategies.branch as branch
-from strategies.branch import yieldify
+from . import branch
+from .branch import yieldify
 
 identity = lambda x: x
 

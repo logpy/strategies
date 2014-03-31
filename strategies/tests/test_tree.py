@@ -1,6 +1,6 @@
 from strategies.tree import (treeapply, treeapply, greedy, allresults,
         brute)
-from functools import partial
+from functools import partial, reduce
 
 def test_treeapply():
     tree = ([3, 3], [4, 1], 2)
