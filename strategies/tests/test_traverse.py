@@ -1,6 +1,6 @@
 from strategies.traverse import (top_down, bottom_up, sall, top_down_once,
         bottom_up_once)
-from term import termify
+from logpy.term import term, operator, arguments
 
 zero_symbols = lambda x: 0 if isinstance(x, str) else x
 x,y,z = 'xyz'
@@ -14,7 +14,18 @@ class Basic(object):
         return "Basic(%s)" % ', '.join(map(str, self.args))
     __repr__ = __str__
 
-termify(Basic)
+
+@operator.register(Basic)
+def _(x):
+    return Basic
+
+@arguments.register(Basic)
+def _(x):
+    return list(x.args)
+
+@term.register(type(Basic), list)
+def _(op, args):
+    return op(*args)
 
 def test_sall():
     zero_onelevel = sall(zero_symbols)
@@ -51,7 +62,6 @@ def _test_stop_on_non_basics(trav):
 class Basic2(Basic):
     pass
 rl = lambda x: Basic2(*x.args) if isinstance(x, Basic) else x
-termify(Basic2)
 
 def test_top_down_once():
     top_rl = top_down_once(rl)

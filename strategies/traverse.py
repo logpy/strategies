@@ -1,6 +1,6 @@
 """ Strategies to Traverse a Tree """
 from .core import chain, do_one
-from term import new, op, args, isleaf
+from logpy.term import operator, arguments, term
 from toolz import curry
 
 @curry
@@ -26,13 +26,11 @@ def bottom_up_once(rule, x):
 @curry
 def sall(rule, expr):
     """ Strategic all - apply rule to args """
-    if isleaf(expr):
+    try:
+        op = operator(expr)
+        children = arguments(expr)
+        if children:
+            children = list(map(rule, children))
+        return term(op, children)
+    except NotImplementedError:
         return expr
-    else:
-        children = args(expr)
-        if isinstance(children, (tuple, list)):
-            children = map(rule, children)
-        if isinstance(children, dict):
-            children = dict(zip(children.keys(),
-                            map(sall(rule), children.values())))
-        return new(op(expr), children)
