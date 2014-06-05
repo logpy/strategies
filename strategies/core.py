@@ -1,8 +1,6 @@
 """ Generic SymPy-Independent Strategies """
-from functools import partial
-from toolz import curry, memoize
+from toolz import curry, memoize, identity
 
-identity = lambda x: x
 
 @curry
 def exhaust(fn, x):
@@ -12,6 +10,7 @@ def exhaust(fn, x):
         new, old = fn(new), new
     return new
 
+
 @curry
 def condition(cond, fn, x):
     """ Only apply fn if condition is true """
@@ -20,6 +19,7 @@ def condition(cond, fn, x):
     else:
         return x
 
+
 @curry
 def chain(fns, x):
     """ Sequentially apply a sequence of functions """
@@ -27,12 +27,14 @@ def chain(fns, x):
         x = fn(x)
     return x
 
+
 @curry
 def onaction(fn, action, x):
     result = fn(x)
     if result != x:
         action(fn, x, result)
     return result
+
 
 def debug(fn, file=None):
     """ Print input and output each time function has an effect """
@@ -46,6 +48,7 @@ def debug(fn, file=None):
 
     return onaction(fn, write)
 
+
 @curry
 def do_one(fns, x):
     """ Try each of the functions until one works. Then stop. """
@@ -55,11 +58,13 @@ def do_one(fns, x):
             return result
     return x
 
+
 @curry
 def switch(key, fndict, x):
     """ Select a function based on the result of key called on the function """
     fn = fndict.get(key(x), identity)
     return fn(x)
+
 
 @curry
 def typed(fntypes, x):
@@ -77,6 +82,7 @@ def typed(fntypes, x):
     """
     return switch(type, fntypes, x)
 
+
 @curry
 def minimize(fns, x, **kwargs):
     """ Select result of functions that minimizes objective
@@ -91,6 +97,5 @@ def minimize(fns, x, **kwargs):
     >>> fn(4)
     5
     """
-
     objective = kwargs.get('objective', identity)
     return min([fn(x) for fn in fns], key=objective)
