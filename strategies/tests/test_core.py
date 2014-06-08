@@ -1,4 +1,4 @@
-from sympy.strategies.core import (exhaust, memoize, condition,
+from strategies.core import (exhaust, memoize, condition,
         chain, do_one, debug, switch, minimize)
 from functools import partial
 
@@ -7,6 +7,7 @@ def posdec(x):
         return x-1
     else:
         return x
+
 def test_exhaust():
     sink = exhaust(posdec)
     assert sink(5) == 0
@@ -24,23 +25,26 @@ def test_condition():
     assert rl(4) == 3
 
 def test_chain():
-    rl = chain(posdec, posdec)
+    rl = chain([posdec, posdec])
     assert rl(5) == 3
     assert rl(1) == 0
 
 def test_do_one():
-    rl = do_one(posdec, posdec)
+    rl = do_one([posdec, posdec])
     assert rl(5) == 4
 
 def test_debug():
-    import StringIO
-    file = StringIO.StringIO()
+    try:
+        from StringIO import StringIO
+    except ImportError:
+        from io import StringIO
+    file = StringIO()
     rl = debug(posdec, file)
     rl(5)
     log = file.getvalue()
     file.close()
 
-    assert posdec.func_name in log
+    assert posdec.__name__ in log
     assert '5' in log
     assert '4' in log
 
@@ -57,16 +61,16 @@ def test_switch():
 def test_minimize():
     inc = lambda x: x + 1
     dec = lambda x: x - 1
-    rl = minimize(inc, dec)
+    rl = minimize([inc, dec])
     assert rl(4) == 3
 
-    rl = minimize(inc, dec, objective=lambda x: -x)
+    rl = minimize([inc, dec], objective=lambda x: -x)
     assert rl(4) == 5
 
 def test_do_one():
     rl1 = lambda x: 2 if x == 1 else x
     rl2 = lambda x: 3 if x == 2 else x
 
-    rule = do_one(rl1, rl2)
+    rule = do_one([rl1, rl2])
     assert rule(1) == 2
     assert rule(rule(1)) == 3

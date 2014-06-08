@@ -1,7 +1,7 @@
 from functools import partial
 from strategies import chain, minimize
-import strategies.branch as branch
-from strategies.branch import yieldify
+from . import branch
+from .branch import yieldify
 
 identity = lambda x: x
 
@@ -21,19 +21,19 @@ def treeapply(tree, join, leaf=identity):
     >>> treeapply(tree, {list: max, tuple: min})
     2
 
-    >>> add = lambda *args: sum(args)
-    >>> def mul(*args):
-    ...     total = 1
-    ...     for arg in args:
-    ...         total *= arg
-    ...     return total
-    >>> treeapply(tree, {list: mul, tuple: add})
+    >>> from toolz.curried import reduce
+    >>> import operator
+    >>> sum = reduce(operator.add)
+    >>> prod = reduce(operator.mul)
+
+    >>> tree = [(3, 2), (4, 1)]
+    >>> treeapply(tree, {list: prod, tuple: sum})
     25
     """
     for typ in join:
         if isinstance(tree, typ):
-            return join[typ](*map(partial(treeapply, join=join, leaf=leaf),
-                                  tree))
+            return join[typ]([treeapply(child, join=join, leaf=leaf)
+                               for child in tree])
     return leaf(tree)
 
 def greedy(tree, objective=identity, **kwargs):

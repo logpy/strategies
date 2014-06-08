@@ -1,29 +1,27 @@
 """ Generic SymPy-Independent Strategies """
-import itertools
+from toolz import curry, filter
 
 def identity(x):
     yield x
 
-def exhaust(fn):
+@curry
+def exhaust(fn, x):
     """ Apply a branching rule repeatedly until it has no effect """
-    def exhaust_brl(x):
-        seen = set([x])
-        for nx in fn(x):
-            if nx not in seen:
-                seen.add(nx)
-                for nnx in exhaust_brl(nx):
-                    yield nnx
-        if seen == set([x]):
-            yield x
-    return exhaust_brl
+    seen = set([x])
+    for nx in fn(x):
+        if nx not in seen:
+            seen.add(nx)
+            for nnx in exhaust(fn, nx):
+                yield nnx
+    if seen == set([x]):
+        yield x
 
-def onaction(fn, action):
-    def onaction_brl(x):
-        for result in fn(x):
-            if result != x:
-                action(fn, x, result)
-            yield result
-    return onaction_brl
+@curry
+def onaction(fn, action, x):
+    for result in fn(x):
+        if result != x:
+            action(fn, x, result)
+        yield result
 
 def debug(fn, file=None):
     """ Print the input and output expressions at each rule application """
@@ -32,78 +30,72 @@ def debug(fn, file=None):
         file = stdout
 
     def write(brl, x, result):
-        file.write("Rule: %s\n"%brl.func_name)
+        file.write("Rule: %s\n"%brl.__name__)
         file.write("In: %s\nOut: %s\n\n"%(x, result))
 
     return onaction(fn, write)
 
-def multiplex(*fns):
+@curry
+def multiplex(fns, x):
     """ Multiplex many branching rules into one """
-    def multiplex_brl(x):
-        seen = set([])
-        for brl in fns:
-            for nx in brl(x):
-                if nx not in seen:
-                    seen.add(nx)
-                    yield nx
-    return multiplex_brl
+    seen = set([])
+    for brl in fns:
+        for nx in brl(x):
+            if nx not in seen:
+                seen.add(nx)
+                yield nx
 
-def condition(cond, fn):
+@curry
+def condition(cond, fn, x):
     """ Only apply branching rule if condition is true """
-    def conditioned_brl(x):
-        if cond(x):
-            for x in fn(x): yield x
-        else:
-            pass
-    return conditioned_brl
-
-def sfilter(pred, fn):
-    """ Yield only those results which satisfy the predicate """
-    def filtered_brl(x):
-        for x in itertools.ifilter(pred, fn(x)):
+    if cond(x):
+        for x in fn(x):
             yield x
-    return filtered_brl
+    else:
+        pass
 
-def notempty(fn):
-    def notempty_brl(x):
-        yielded = False
-        for nx in fn(x):
+@curry
+def sfilter(pred, fn, x):
+    """ Yield only those results which satisfy the predicate """
+    for x in filter(pred, fn(x)):
+        yield x
+
+@curry
+def notempty(fn, x):
+    yielded = False
+    for nx in fn(x):
+        yielded = True
+        yield nx
+    if not yielded:
+        yield x
+
+@curry
+def do_one(fns, x):
+    """ Execute one of the branching rules """
+    yielded = False
+    for brl in fns:
+        for nx in brl(x):
             yielded = True
             yield nx
-        if not yielded:
-            yield x
-    return notempty_brl
+        if yielded:
+            raise StopIteration()
 
-def do_one(*fns):
-    """ Execute one of the branching rules """
-    def do_one_brl(x):
-        yielded = False
-        for brl in fns:
-            for nx in brl(x):
-                yielded = True
-                yield nx
-            if yielded:
-                raise StopIteration()
-    return do_one_brl
-
-def chain(*fns):
+@curry
+def chain(fns, x):
     """
     Compose a sequence of fns so that they apply to the expr sequentially
     """
-    def chain_brl(x):
-        if not fns:
-            yield x
-            raise StopIteration()
+    if not fns:
+        yield x
+        raise StopIteration()
 
-        head, tail = fns[0], fns[1:]
-        for nx in head(x):
-            for nnx in chain(*tail)(nx):
-                yield nnx
+    head, tail = fns[0], fns[1:]
+    for nx in head(x):
+        for nnx in chain(tail)(nx):
+            yield nnx
 
-    return chain_brl
 
-def yieldify(rl):
+@curry
+def yieldify(rl, x):
     """ Turn a rule into a branching rule """
-    def brl(x):
-        yield rl(x)
-    return brl
+    yield rl(x)

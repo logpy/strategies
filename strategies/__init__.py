@@ -22,5 +22,5 @@ strategies.traverse   - strategies that traverse a SymPy tree
 strategies.tools      - some conglomerate strategies that do depend on SymPy
 """
 
-from core import condition, debug, chain, do_one, exhaust, minimize
-import branch
+from .core import condition, debug, chain, do_one, exhaust, minimize
+from . import branch
