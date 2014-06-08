@@ -21,13 +21,13 @@ def treeapply(tree, join, leaf=identity):
     >>> treeapply(tree, {list: max, tuple: min})
     2
 
-    >>> add = lambda *args: sum(args)
-    >>> def mul(*args):
-    ...     total = 1
-    ...     for arg in args:
-    ...         total *= arg
-    ...     return total
-    >>> treeapply(tree, {list: mul, tuple: add})
+    >>> from toolz.curried import reduce
+    >>> import operator
+    >>> sum = reduce(operator.add)
+    >>> prod = reduce(operator.mul)
+
+    >>> tree = [(3, 2), (4, 1)]
+    >>> treeapply(tree, {list: prod, tuple: sum})
     25
     """
     for typ in join:
