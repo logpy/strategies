@@ -2,7 +2,7 @@ from os.path import exists
 from setuptools import setup
 
 setup(name='strategies',
-      version='0.1.2',
+      version='0.2.0',
       description='Strategic Programming in python',
       url='http://github.com/logpy/strategies',
       author='Matthew Rocklin',
