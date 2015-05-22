@@ -1,6 +1,17 @@
 from strategies.core import (exhaust, memoize, condition,
-        chain, do_one, debug, switch, minimize)
+        chain, do_one, debug, switch, minimize, null_safe)
 from functools import partial
+
+
+def test_null_safe():
+    def rl(expr):
+        if expr == 1:
+            return 2
+    safe_rl = null_safe(rl)
+    assert rl(1) == safe_rl(1)
+
+    assert      rl(3) == None
+    assert safe_rl(3) == 3
 
 def posdec(x):
     if x > 0:

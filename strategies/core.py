@@ -49,6 +49,17 @@ def debug(fn, file=None):
     return onaction(fn, write)
 
 
+def null_safe(rule):
+    """ Return original expr if rule returns None """
+    def null_safe_rl(expr):
+        result = rule(expr)
+        if result is None:
+            return expr
+        else:
+            return result
+    return null_safe_rl
+
+
 @curry
 def do_one(fns, x):
     """ Try each of the functions until one works. Then stop. """
