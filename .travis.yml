@@ -1,0 +1,17 @@
+language: python
+sudo: false
+python:
+  - 2.6
+  - 2.7
+  - 3.2
+  - 3.3
+  - 3.4
+  - "pypy"
+  - "pypy3"
+script:
+  - python setup.py test
+before_install:
+  # XXX: see logpy/strategies#4
+  - pip install git+https://github.com/logpy/logpy
+notifications:
+  email: false

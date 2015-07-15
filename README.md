@@ -1,6 +1,8 @@
 Strategies
 ==========
 
+[![](https://travis-ci.org/logpy/strategies.png)](https://travis-ci.org/logpy/strategies)
+
 A Python library for control flow programming.
 
 This project contains a set of complementary higher order functions that
