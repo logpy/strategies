@@ -23,4 +23,5 @@ strategies.tools      - some conglomerate strategies that do depend on SymPy
 """
 
 from .core import condition, debug, chain, do_one, exhaust, minimize
+from .tools import typed
 from . import branch
