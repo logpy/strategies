@@ -1,6 +1,6 @@
 from strategies.traverse import (top_down, bottom_up, sall, top_down_once,
         bottom_up_once)
-from logpy.term import term, operator, arguments
+from strategies.term import term, operator, arguments
 
 zero_symbols = lambda x: 0 if isinstance(x, str) else x
 x,y,z = 'xyz'

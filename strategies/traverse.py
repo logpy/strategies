@@ -1,6 +1,6 @@
 """ Strategies to Traverse a Tree """
 from .core import chain, do_one
-from logpy.term import operator, arguments, term
+from .term import operator, arguments, term
 from toolz import curry
 
 @curry

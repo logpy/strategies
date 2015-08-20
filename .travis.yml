@@ -10,8 +10,5 @@ python:
   - "pypy3"
 script:
   - python setup.py test
-before_install:
-  # XXX: see logpy/strategies#4
-  - pip install git+https://github.com/logpy/logpy
 notifications:
   email: false
