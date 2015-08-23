@@ -25,7 +25,7 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 setup(name='strategies',
-      version='0.2.0',
+      version='0.2.3',
       description='Strategic Programming in python',
       url='http://github.com/logpy/strategies',
       author='Matthew Rocklin',
